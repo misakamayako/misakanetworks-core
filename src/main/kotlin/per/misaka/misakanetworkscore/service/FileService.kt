@@ -1,6 +1,5 @@
 package per.misaka.misakanetworkscore.service
 
-import com.aliyun.sdk.service.sts20150401.models.AssumeRoleResponseBody.Credentials
 import org.springframework.stereotype.Service
 import per.misaka.misakanetworkscore.dto.STSDTO
 import per.misaka.misakanetworkscore.exception.InternalServerException

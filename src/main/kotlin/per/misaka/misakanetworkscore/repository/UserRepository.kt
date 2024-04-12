@@ -1,10 +1,14 @@
 package per.misaka.misakanetworkscore.repository
 
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository
+import org.springframework.stereotype.Repository
 import per.misaka.misakanetworkscore.entity.UserEntity
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
+@Repository
 interface UserRepository : ReactiveCrudRepository<UserEntity, Int> {
-    suspend fun findByUsername(userName: String): UserEntity?
-    suspend fun deleteByUsername(userName: String)
-    suspend fun existsByUsername(userName: String): Boolean
+    fun findByUsername(userName: String): Mono<UserEntity?>
+    fun deleteByUsername(userName: String): Flux<Void>
+    fun existsByUsername(userName: String): Flux<Boolean>
 }

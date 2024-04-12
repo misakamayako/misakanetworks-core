@@ -1,12 +1,12 @@
 package per.misaka.misakanetworkscore.service
 
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import per.misaka.misakanetworkscore.repository.UserRepository
 
@@ -16,7 +16,7 @@ class CoreUserDetailsService(private val userRepository: UserRepository) : UserD
         if (username.isNullOrBlank()) {
             throw UsernameNotFoundException("$username not found")
         }
-        val check = runBlocking { userRepository.findByUsername(username) }?:return null
+        val check = runBlocking{ userRepository.findByUsername(username).awaitSingle()} ?: return null
         return User(check.username, check.password, listOf(SimpleGrantedAuthority("admin")))
     }
 }

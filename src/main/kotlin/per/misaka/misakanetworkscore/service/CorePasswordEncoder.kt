@@ -9,12 +9,8 @@ import per.misaka.misakanetworkscore.exception.InternalServerException
 
 @Service
 class CorePasswordEncoder : PasswordEncoder {
-    companion object {
-        @JvmStatic
-        val logger: Logger = LoggerFactory.getLogger(CorePasswordEncoder::class.java)
-        @JvmStatic
-        val encoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8()
-    }
+    private  val logger: Logger = LoggerFactory.getLogger(CorePasswordEncoder::class.java)
+    private val encoder: Pbkdf2PasswordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8()
     override fun encode(rawPassword: CharSequence?): String {
         if (rawPassword.isNullOrEmpty()) {
             throw InternalServerException("密码为空")
@@ -26,6 +22,6 @@ class CorePasswordEncoder : PasswordEncoder {
         if (rawPassword == null || encodedPassword == null) {
             return false
         }
-        return encoder.matches(rawPassword,encodedPassword)
+        return encoder.matches(rawPassword, encodedPassword)
     }
 }

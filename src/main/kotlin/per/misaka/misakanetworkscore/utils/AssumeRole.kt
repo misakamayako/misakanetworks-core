@@ -4,7 +4,6 @@ import com.aliyun.auth.credentials.Credential
 import com.aliyun.auth.credentials.provider.StaticCredentialProvider
 import com.aliyun.sdk.service.sts20150401.AsyncClient
 import com.aliyun.sdk.service.sts20150401.models.AssumeRoleRequest
-import com.google.gson.Gson
 import darabonba.core.client.ClientOverrideConfiguration
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

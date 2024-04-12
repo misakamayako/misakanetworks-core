@@ -22,7 +22,7 @@ class CoreUserDetailsManager(private val userDb: UserRepository, private val enc
     override fun loadUserByUsername(username: String?): UserDetails? {
         if (username.isNullOrEmpty()) return null
         logger.info("new login: username:$username")
-        val user = runBlocking { userDb.findByUsername(username) } ?: return null
+        val user = runBlocking { userDb.findByUsername(username).awaitSingle()  }?: return null
         return User(user.username, user.password, emptyList())
     }
 
@@ -56,6 +56,6 @@ class CoreUserDetailsManager(private val userDb: UserRepository, private val enc
 
     override fun userExists(username: String?): Boolean {
         if (username == null) return false
-        return runBlocking { userDb.existsByUsername(username) }
+        return runBlocking { userDb.existsByUsername(username).blockFirst()?:false }
     }
 }
