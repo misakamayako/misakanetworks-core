@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import per.misaka.misakanetworkscore.dto.UserDTO
-import per.misaka.misakanetworkscore.exception.unofficialError.MaliciousUserDetected
 import per.misaka.misakanetworkscore.service.RedisService
 import per.misaka.misakanetworkscore.service.UserService
 import java.util.*
@@ -32,15 +31,30 @@ final class UserController(private val userService: UserService, private val red
         }
         val uuid = UUID.randomUUID().toString()
         redisService.saveEntity(userId, uuid, 1L, TimeUnit.HOURS)
-        val ck = ResponseCookie.from("token", uuid)
-        ck.httpOnly(true)
-        val headers = HttpHeaders()
-        headers.set(HttpHeaders.SET_COOKIE, ck.build().toString())
-        return ResponseEntity.ok().headers(headers).build()
+        val httpHeaders = HttpHeaders()
+        ResponseCookie.from("token", uuid)
+            .path("/")
+            .maxAge(3600)
+            .httpOnly(true)
+            .build()
+            .let { httpHeaders.set(HttpHeaders.SET_COOKIE, it.toString()) }
+        return ResponseEntity.noContent().headers(httpHeaders).build()
     }
 
-    @PostMapping("/test444")
-    fun test444() {
-        throw MaliciousUserDetected()
+    @PostMapping("/logoutHandler")
+    suspend fun userLogout(@CookieValue(name = "token") token: String): ResponseEntity<Void> {
+        val httpHeaders = HttpHeaders()
+        if (token.isNotEmpty()) {
+            val userId = redisService.getEntity(token, Int::class)
+            logger.info("new logout request as \"${userId}\"")
+            redisService.removeEntity(token)
+            ResponseCookie.from("token", token)
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .build()
+                .let { httpHeaders.set(HttpHeaders.SET_COOKIE, it.toString()) }
+        }
+        return ResponseEntity.noContent().headers(httpHeaders).build()
     }
 }

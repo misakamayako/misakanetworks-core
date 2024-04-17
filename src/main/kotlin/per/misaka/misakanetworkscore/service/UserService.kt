@@ -12,12 +12,11 @@ import per.misaka.misakanetworkscore.exception.BadRequestException
 import per.misaka.misakanetworkscore.repository.UserRepository
 
 @Service
-class UserService(
+final class UserService(
     private val userDB: UserRepository,
     private val encoder: CorePasswordEncoder
 ) {
-    val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
-
+    private final val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
     suspend fun resign(account: String, password: String) = withContext(Dispatchers.IO) {
         logger.info("try create new account, account name:$account")
         val check = userDB.findByUsername(account).awaitSingle()

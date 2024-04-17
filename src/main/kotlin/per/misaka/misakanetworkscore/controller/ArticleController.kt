@@ -12,14 +12,11 @@ import per.misaka.misakanetworkscore.service.ArticleService
 
 @RestController
 @RequestMapping("/internalApi/article")
-class ArticleController(private val service: ArticleService) {
-    companion object {
-        @JvmStatic
-        private val log = LogManager.getLogger(this::class.java)
-    }
+class ArticleController(private val articleService: ArticleService) {
+    private val log = LogManager.getLogger(this::class.java)
 
     @PostMapping("")
-    suspend fun getArticle(@Valid @RequestBody articleUploadDTO: ArticleUploadDTO): ArticleEntity {
-        return service.createArticle(articleUploadDTO)
+    suspend fun createArticle(@Valid @RequestBody articleUploadDTO: ArticleUploadDTO): ArticleEntity {
+        return articleService.createArticle(articleUploadDTO)
     }
 }

@@ -14,15 +14,12 @@ import per.misaka.misakanetworkscore.service.CorePasswordEncoder
 @Component
 class CoreUserDetailsManager(private val userDb: UserRepository, private val encoder: CorePasswordEncoder) :
     UserDetailsManager {
-    companion object {
-        @JvmStatic
-        private val logger = LoggerFactory.getLogger(CorePasswordEncoder::class.java)
-    }
+    private val logger = LoggerFactory.getLogger(CorePasswordEncoder::class.java)
 
     override fun loadUserByUsername(username: String?): UserDetails? {
         if (username.isNullOrEmpty()) return null
         logger.info("new login: username:$username")
-        val user = runBlocking { userDb.findByUsername(username).awaitSingle()  }?: return null
+        val user = runBlocking { userDb.findByUsername(username).awaitSingle() } ?: return null
         return User(user.username, user.password, emptyList())
     }
 
@@ -47,7 +44,7 @@ class CoreUserDetailsManager(private val userDb: UserRepository, private val enc
 
     override fun deleteUser(username: String?) {
         if (username == null) return
-        runBlocking{ userDb.deleteByUsername(username) }
+        runBlocking { userDb.deleteByUsername(username) }
     }
 
     override fun changePassword(oldPassword: String?, newPassword: String?) {
@@ -56,6 +53,6 @@ class CoreUserDetailsManager(private val userDb: UserRepository, private val enc
 
     override fun userExists(username: String?): Boolean {
         if (username == null) return false
-        return runBlocking { userDb.existsByUsername(username).blockFirst()?:false }
+        return runBlocking { userDb.existsByUsername(username).blockFirst() ?: false }
     }
 }
