@@ -1,13 +1,19 @@
 create database if not exists MisakaNetworks
     DEFAULT CHARACTER SET utf8mb4;
 use MisakaNetworks;
-create table if not exists article
+CREATE TABLE article
 (
-    id       int primary key auto_increment,
-    title    varchar(80) not null,
-    brief    varchar(120),
-    createAt DATETIME    not null
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    title        VARCHAR(255) NOT NULL,
+    markdown_url VARCHAR(512) NOT NULL,
+    html_url     VARCHAR(512) NOT NULL,
+    preview      TEXT         NOT NULL,
+    author       VARCHAR(100) NOT NULL,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+
 create table if not exists article_to_category
 (
     id       int primary key auto_increment,
@@ -70,8 +76,8 @@ create table if not exists img_to_category
 );
 CREATE TABLE if not exists users
 (
-    id int primary key  auto_increment,
-    username VARCHAR(50)  NOT NULL unique ,
+    id       int primary key auto_increment,
+    username VARCHAR(50)  NOT NULL unique,
     password VARCHAR(500) NOT NULL,
     enabled  BOOLEAN      NOT NULL,
     UNIQUE INDEX ix_auth_username (username)
@@ -79,7 +85,15 @@ CREATE TABLE if not exists users
 
 CREATE TABLE if not exists authorities
 (
-    userId  int NOT NULL,
+    userId    int         NOT NULL,
     authority VARCHAR(50) NOT NULL,
     CONSTRAINT fk_authorities_users FOREIGN KEY (userId) REFERENCES users (id)
 );
+
+CREATE TABLE if not exists delete_confirm
+(
+    id   int auto_increment primary key,
+    uuid varchar(64) not null,
+    type varchar(8)  not null,
+    UNIQUE INDEX ix_uuid (uuid)
+)

@@ -12,3 +12,4 @@ data class AlbumEntity(
     var grading: Int? = null,
     var private: Boolean? = null
 )
+

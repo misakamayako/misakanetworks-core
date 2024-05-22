@@ -25,12 +25,24 @@ suspend fun getAssumeRole() = coroutineScope {
                 .setEndpointOverride("sts.cn-shanghai.aliyuncs.com")
         )
         .build()
-
+    val policy = """
+        {
+            Version:"1",
+            Statement:[
+                {
+                    Action: ["oss:PutObject"],
+                    Resource: ["acs:oss:*:*:misaka-temp-bucket/*"],
+                    Effect:"Allow"
+                }
+            ]
+        }
+    """.trimIndent()
     val assumeRoleRequest =
         AssumeRoleRequest.builder()
             .roleSessionName("3333")
             .durationSeconds(3600L)
             .roleArn(applicationConfig.tempRole)
+            .policy(policy)
             .build()
 
     async {
