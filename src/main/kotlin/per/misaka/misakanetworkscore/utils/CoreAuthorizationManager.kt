@@ -15,10 +15,7 @@ import kotlin.system.exitProcess
 @Service
 class CoreAuthorizationManager(private val redisService: RedisService) :
     AuthorizationManager<RequestAuthorizationContext?> {
-    companion object {
-        @JvmStatic
-        private val logger = LoggerFactory.getLogger(CoreAuthorizationManager::class.java)
-    }
+    private val logger = LoggerFactory.getLogger(CoreAuthorizationManager::class.java)
 
     override fun check(
         authentication: Supplier<Authentication>,
@@ -34,7 +31,7 @@ class CoreAuthorizationManager(private val redisService: RedisService) :
             if (count > 50) {
                 logger.error("too many attack from $ip, auto added to blackList")
             } else {
-                logger.warn("unknown login request, from ip:${ip}, $count times in 30 minutes")
+                logger.warn("unknown login request, from ip:$ip, $count times in 30 minutes")
             }
             redisService.saveEntity(count, ip, 30, TimeUnit.MINUTES)
             if (count > 30) {

@@ -7,7 +7,7 @@ import per.misaka.misakanetworkscore.dto.STSDTO
 import per.misaka.misakanetworkscore.service.FileService
 
 @RestController
-@RequestMapping("/internalApi/access")
+@RequestMapping("/access")
 class STSController(val ossService: FileService) {
     @GetMapping("/oss")
     suspend fun getOssToken(): STSDTO {
