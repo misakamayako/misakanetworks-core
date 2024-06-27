@@ -31,7 +31,7 @@ class AlbumService(
     @Transactional
     suspend fun createAlbum(createAlbumDTO: CreateAlbumDTO): AlbumEntity{
         if (createAlbumDTO.categories?.isNotEmpty() == true) {
-            if (!categoryDB.allExistsByIds(createAlbumDTO.categories, createAlbumDTO.categories.size)) {
+            if (!categoryDB.allExistsByIds(createAlbumDTO.categories, createAlbumDTO.categories.size).awaitFirst()) {
                 throw BadRequestException("必选先添加所有的类型标签")
             }
         }

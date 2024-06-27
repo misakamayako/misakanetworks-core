@@ -13,14 +13,10 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/internalApi/album")
-class AlbumController(
+class AlbumController {
     @Autowired
-    private val service: AlbumService
-) {
-    companion object {
-        @JvmStatic
-        val log: Log = LogFactory.getLog(AlbumController::class.java)
-    }
+    private lateinit var service: AlbumService
+    val log: Log = LogFactory.getLog(AlbumController::class.java)
 
     @PostMapping("")
     suspend fun createAlbum(@RequestBody @Validated createAlbumDTO: CreateAlbumDTO): ResponseEntity<Void> {

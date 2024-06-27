@@ -1,11 +1,9 @@
 package per.misaka.misakanetworkscore.controller
 
-import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.*
 import per.misaka.misakanetworkscore.dto.CategoryDTO
+import per.misaka.misakanetworkscore.dto.CategoryType
 import per.misaka.misakanetworkscore.service.CategoryService
 
 @RestController
@@ -13,7 +11,15 @@ import per.misaka.misakanetworkscore.service.CategoryService
 class CategoryController(private val service: CategoryService) {
 
     @PostMapping("")
-    suspend fun createCategory(@RequestBody @Valid category: CategoryDTO): CategoryDTO {
+    suspend fun createCategory(@RequestBody @Validated category: CategoryDTO): CategoryDTO {
         return service.createCategory(category)
+    }
+
+    @GetMapping("")
+    suspend fun getAllCateGory(
+        @RequestParam(name = "type", required = false)
+        categoryType: CategoryType
+    ): List<CategoryDTO> {
+        return service.getAllCategory(categoryType)
     }
 }

@@ -1,6 +1,7 @@
 package per.misaka.misakanetworkscore.service
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.withContext
@@ -24,7 +25,7 @@ class ImgService(
     @Transactional
     suspend fun createImgRecord(imgUploadDTO: ImgUploadDTO): ImgEntity = withContext(Dispatchers.IO) {
         if (imgUploadDTO.categories?.isNotEmpty() == true) {
-            if (!categoryRepository.allExistsByIds(imgUploadDTO.categories, imgUploadDTO.categories.size)) {
+            if (!categoryRepository.allExistsByIds(imgUploadDTO.categories, imgUploadDTO.categories.size).awaitFirst()) {
                 throw BadRequestException("请先创建所有的标签")
             }
         }

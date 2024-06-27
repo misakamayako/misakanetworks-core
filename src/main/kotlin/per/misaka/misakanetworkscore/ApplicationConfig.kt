@@ -7,6 +7,7 @@ import org.springframework.context.annotation.PropertySource
 @Configuration
 @PropertySource("classpath:secret.properties")
 class ApplicationConfig {
+
     @Value("\${aliyun.OSS.accessKeyId}")
     lateinit var accessKeyId: String
 
