@@ -16,7 +16,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @RestController
-final class UserController(private val userService: UserService, private val redisService: RedisService) {
+class UserController(private val userService: UserService, private val redisService: RedisService) {
     private val logger = LoggerFactory.getLogger(UserController::class.java)
 
     @PostMapping("/login")

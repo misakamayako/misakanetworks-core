@@ -25,4 +25,7 @@ class ApplicationConfig {
     lateinit var cryptoKey: String
     @Value("\${crypto.salt}")
     lateinit var cryptoSalt: String
+
+    @Value("\${aliyun.OSS.EndPoint}")
+    lateinit var endpoint:String
 }

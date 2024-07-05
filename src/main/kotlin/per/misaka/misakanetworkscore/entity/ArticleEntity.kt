@@ -19,8 +19,8 @@ data class ArticleEntity(
     @Column("html_url")
     val htmlUrl: String,
 
-    @Column("preview")
-    val preview: String,
+    @Column("brief")
+    val brief: String,
 
     @Column("author")
     val author: String,

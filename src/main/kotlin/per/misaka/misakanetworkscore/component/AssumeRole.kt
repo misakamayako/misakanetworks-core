@@ -8,14 +8,18 @@ import com.aliyun.sdk.service.sts20150401.models.AssumeRoleResponseBody
 import darabonba.core.client.ClientOverrideConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import per.misaka.misakanetworkscore.ApplicationConfig
+import per.misaka.misakanetworkscore.constants.OSSBucket
 
 @Component
 class AssumeRole {
     @Autowired
     private lateinit var applicationConfig: ApplicationConfig
+
+    private val logger =  LoggerFactory.getLogger(this::class.java)
 
     suspend fun getAliAssumeRole(): AssumeRoleResponseBody.Credentials? {
         val provider = StaticCredentialProvider.create(
@@ -33,7 +37,8 @@ class AssumeRole {
             )
             .build()
         val policy =
-            "{\"Version\":\"1\",\"Statement\":[{\"Action\":[\"oss:PutObject\"],\"Resource\":[\"acs:oss:*:*:misaka-temp-bucket/*\"],\"Effect\":\"Allow\"}]}"
+            "{\"Version\":\"1\",\"Statement\":[{\"Action\":[\"oss:PutObject\",\"oss:GetObject\"],\"Resource\":[\"acs:oss:*:*:${OSSBucket.Temp.value}/*\"],\"Effect\":\"Allow\"}]}"
+        logger.info("new auth:$policy")
         val assumeRoleRequest =
             AssumeRoleRequest.builder()
                 .roleSessionName("3333")

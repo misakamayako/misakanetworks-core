@@ -2,15 +2,21 @@ package per.misaka.misakanetworkscore
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.transaction.annotation.EnableTransactionManagement
 
-
-@SpringBootApplication//(scanBasePackageClasses = [CustomExceptionHandler::class])
+@SpringBootApplication
 @EnableTransactionManagement
 @EnableAsync
-class MisakaNetworksCoreApplication
-
-fun main(args: Array<String>) {
-    runApplication<MisakaNetworksCoreApplication>(*args)
+@EnableAspectJAutoProxy
+class MisakaNetworksCoreApplication{
+    companion object{
+        @JvmStatic
+        fun main(args: Array<String>) {
+            // 阿里云默认xml解析有问题，需要替换
+            System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl")
+            runApplication<MisakaNetworksCoreApplication>(*args)
+        }
+    }
 }

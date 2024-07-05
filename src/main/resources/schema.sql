@@ -1,5 +1,4 @@
-create database if not exists MisakaNetworks
-    DEFAULT CHARACTER SET utf8mb4;
+create database if not exists MisakaNetworks DEFAULT CHARACTER SET utf8mb4;
 use MisakaNetworks;
 CREATE TABLE article
 (
@@ -7,13 +6,11 @@ CREATE TABLE article
     title        VARCHAR(255) NOT NULL,
     markdown_url VARCHAR(512) NOT NULL,
     html_url     VARCHAR(512) NOT NULL,
-    preview      TEXT         NOT NULL,
+    brief        VARCHAR(200) NOT NULL,
     author       VARCHAR(100) NOT NULL,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
-
 create table if not exists article_to_category
 (
     id       int primary key auto_increment,
@@ -36,7 +33,6 @@ create table if not exists file_mapping
     create_at   datetime    not null,
     delete_flag bool         default false
 );
-
 create table if not exists album
 (
     id      int primary key auto_increment,
@@ -45,7 +41,6 @@ create table if not exists album
     grading int  default 1 comment '1：健全，2：16x,3:18x',
     private bool default false
 );
-
 create table if not exists album_to_category
 (
     id          int primary key auto_increment,
@@ -54,7 +49,6 @@ create table if not exists album_to_category
     foreign key (album_id) references album (id),
     foreign key (category_id) references category (id)
 );
-
 create table if not exists img
 (
     id          int primary key auto_increment,
@@ -65,7 +59,6 @@ create table if not exists img
     album       int  default null,
     foreign key (album) references album (id)
 );
-
 create table if not exists img_to_category
 (
     id          int primary key auto_increment,
@@ -82,14 +75,12 @@ CREATE TABLE if not exists users
     enabled  BOOLEAN      NOT NULL,
     UNIQUE INDEX ix_auth_username (username)
 );
-
 CREATE TABLE if not exists authorities
 (
     userId    int         NOT NULL,
     authority VARCHAR(50) NOT NULL,
     CONSTRAINT fk_authorities_users FOREIGN KEY (userId) REFERENCES users (id)
 );
-
 CREATE TABLE if not exists delete_confirm
 (
     id   int auto_increment primary key,

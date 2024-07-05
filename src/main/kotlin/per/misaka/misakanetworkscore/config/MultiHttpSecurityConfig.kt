@@ -35,7 +35,7 @@ class MultiHttpSecurityConfig {
                 authorize(HttpMethod.GET, "/**", permitAll)
                 authorize(HttpMethod.POST, "/logoutHandler", permitAll)
                 authorize(HttpMethod.POST, "/login", permitAll)
-                authorize("/internalApi/**", authenticated)//hasRole("USER")
+                authorize("/internalApi/**", permitAll)//authenticated)//hasRole("USER")
             }
         }
         return http.build()
