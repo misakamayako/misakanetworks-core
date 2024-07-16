@@ -8,8 +8,9 @@ CREATE TABLE article
     html_url     VARCHAR(512) NOT NULL,
     brief        VARCHAR(200) NOT NULL,
     author       VARCHAR(100) NOT NULL,
-    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    hasDelete    tinyint(1) default 0,
+    created_at   TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 create table if not exists article_to_category
 (
@@ -81,10 +82,13 @@ CREATE TABLE if not exists authorities
     authority VARCHAR(50) NOT NULL,
     CONSTRAINT fk_authorities_users FOREIGN KEY (userId) REFERENCES users (id)
 );
-CREATE TABLE if not exists delete_confirm
+create table if not exists file_mapping_of_article
 (
-    id   int auto_increment primary key,
-    uuid varchar(64) not null,
-    type varchar(8)  not null,
-    UNIQUE INDEX ix_uuid (uuid)
-)
+    id           bigint auto_increment primary key,
+    bucket       varchar(31)  not null comment 'oss bucket name, don\'t store temp bucket',
+    file_key     varchar(255) not null unique,
+    connect_file bigint,
+    delete_flag  tinyint(1) default 0,
+    CONSTRAINT fk_file_to_article foreign key (connect_file) REFERENCES article (id),
+    index (connect_file)
+);

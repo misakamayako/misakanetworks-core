@@ -1,5 +1,6 @@
 package per.misaka.misakanetworkscore.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotEmpty
 
 data class CreateAlbumDTO(
@@ -8,6 +9,6 @@ data class CreateAlbumDTO(
     val cover:String?,
     val categories:List<Int>?,
     val grading:Int?,
-    @Transient
+    @field:JsonIgnore
     val private:Boolean?
 )

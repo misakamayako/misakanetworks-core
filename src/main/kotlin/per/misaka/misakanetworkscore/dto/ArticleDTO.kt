@@ -1,12 +1,16 @@
 package per.misaka.misakanetworkscore.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDateTime
 
 
 data class ArticleUploadDTO(
     @NotNull(message = "标题不可为空")
     val title: String,
-    val brief:String,
+    val brief: String,
     val categories: List<Int>,
     val content: String
 )
@@ -15,21 +19,53 @@ data class ArticleDTO(
     val title: String,
     val category: List<Int>,
     val content: String,
-    @Transient
+    @field:JsonIgnore
     val id: Int,
     val views: Int
 )
 
-data class ArticlePreviewContent(val content:String)
+data class ArticlePreviewContent(val content: String)
 data class QueryResultArticleDTO(
     val id: Long,
     val title: String,
-    val markdownUrl: String,
-    val htmlUrl: String,
-    val brief: String,
-    val author: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val categories: List<String>,
-    val categoryTypes: List<String>
-)
+    val markdownUrl: String?,
+    val htmlUrl: String?,
+    val brief: String?,
+    val author: String?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val createdAt: LocalDateTime?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val updatedAt: LocalDateTime?,
+    @field:JsonIgnore
+    val categories: String?,
+    @field:JsonIgnore
+    val categoryTypes: String?
+) {
+    @get:JsonProperty
+    val category: List<CategoryDTO>
+        get() {
+            return if (categories != null && categoryTypes != null) {
+                val categoryList = categories.split(",")
+                val categoryTypeList = categoryTypes.split(",")
+                categoryList.mapIndexed { index, s ->
+                    CategoryDTO(s, categoryTypeList[index].toInt(), 2)
+                }
+            } else {
+                emptyList()
+            }
+        }
+}
+
+data class ArticleDetailDTO(
+    val id: Long,
+    val title: String,
+    val brief: String?,
+    var content: String,
+    var categories: List<Int>? = null,
+    var imgList: List<String>? = null
+) {
+    init {
+        if (categories == null) categories = emptyList()
+        if (imgList == null) imgList = emptyList()
+    }
+}

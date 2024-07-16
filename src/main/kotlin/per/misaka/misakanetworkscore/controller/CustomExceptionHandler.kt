@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import per.misaka.misakanetworkscore.dto.ApiResponse
 import per.misaka.misakanetworkscore.dto.ErrorResponseDto
 import per.misaka.misakanetworkscore.exception.unofficialError.UnofficialError
 import java.lang.reflect.Method
@@ -28,9 +29,9 @@ class CustomExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException::class)
-    fun handleDefaultException(ex: RuntimeException): ResponseEntity<String> {
+    fun handleDefaultException(ex: RuntimeException): ResponseEntity<ApiResponse<Nothing>> {
         val code = getAnnotationStatusCode(ex::class.java) ?: 500
-        return ResponseEntity.status(code).body(ex.message)
+        return ResponseEntity.status(code).body(ApiResponse(code,ex.message?:"未知错误",null))
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)

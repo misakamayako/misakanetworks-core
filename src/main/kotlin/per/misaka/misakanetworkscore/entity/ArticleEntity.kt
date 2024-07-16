@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Table("article")
 data class ArticleEntity(
     @Id
-    val id: Int? = null,
+    val id: Long? = null,
 
     @Column("title")
     val title: String,
@@ -24,6 +24,8 @@ data class ArticleEntity(
 
     @Column("author")
     val author: String,
+
+    val views:Int=0,
 
     @Column("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now(),

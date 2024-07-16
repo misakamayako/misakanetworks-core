@@ -3,8 +3,10 @@ package per.misaka.misakanetworkscore.service
 import com.aliyun.oss.ClientBuilderConfiguration
 import com.aliyun.oss.OSS
 import com.aliyun.oss.OSSClientBuilder
+import com.aliyun.oss.OSSException
 import com.aliyun.oss.common.comm.Protocol
 import com.aliyun.oss.model.CopyObjectResult
+import com.aliyun.oss.model.OSSObject
 import com.aliyun.oss.model.PutObjectResult
 import com.aliyun.oss.model.VoidResult
 import jakarta.annotation.PostConstruct
@@ -19,6 +21,7 @@ import per.misaka.misakanetworkscore.ApplicationConfig
 import per.misaka.misakanetworkscore.component.AesEncrypto
 import per.misaka.misakanetworkscore.constants.OSSBucket
 import per.misaka.misakanetworkscore.constants.OSSBucketURL
+import per.misaka.misakanetworkscore.exception.NotFoundException
 import java.io.InputStream
 
 
@@ -126,6 +129,23 @@ class OSSService {
             } catch (e: Exception) {
                 result.completeExceptionally(e)
                 logger.error("copyObject error: ${e.message}",e)
+            }
+        }
+        return result
+    }
+    suspend fun getObject(bucket:OSSBucket,key:String):Deferred<OSSObject>{
+        logger.info("get object at ${bucket.value}/$key")
+        val result = CompletableDeferred<OSSObject>()
+        submit {
+            try{
+                val getResult = ossClient.getObject(bucket.value,key)
+                result.complete(getResult)
+            } catch (e:Exception){
+                result.completeExceptionally(e)
+                logger.error("get object failed: ${e.message}",e)
+                if (e is OSSException&&e.errorCode==="noSuchKey"){
+                    throw NotFoundException("no object named $key")
+                }
             }
         }
         return result
