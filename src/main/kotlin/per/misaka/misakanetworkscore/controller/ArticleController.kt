@@ -18,8 +18,8 @@ class ArticleController {
 
 
     @PostMapping("")
-    suspend fun createArticle(@Valid @RequestBody articleUploadDTO: ArticleUploadDTO): ResponseEntity<Void> {
-        articleService.createArticle(articleUploadDTO)
+    suspend fun createArticle(@Valid @RequestBody articleDTO: ArticleDTO): ResponseEntity<Void> {
+        articleService.createArticle(articleDTO)
         return ResponseEntity.noContent().build<Void>()
     }
 
@@ -27,14 +27,14 @@ class ArticleController {
     suspend fun queryArticle(
         @RequestParam(value = "page", required = false) page: Int = 1,
         @RequestParam(value = "pageSize", required = false) pageSize: Int = 10
-    ): PageResultDTO<QueryResultArticleDTO> {
-        return articleService.getArticleList(page, pageSize)
+    ): PageResultDTO<QueryResultArticleDTO?> {
+        return articleService.queryArticleList(page, pageSize)
     }
 
     @GetMapping("{id}")
     suspend fun getArticleDetail(
-        @Valid @PathVariable("id") id:Long
-    ): ArticleDetailDTO? {
+        @Valid @PathVariable("id") id:Int
+    ): QueryResultArticleDTO? {
         return  articleService.getArticleDetail(id)
     }
 
@@ -43,18 +43,25 @@ class ArticleController {
         @Valid @RequestBody articleDTO: ArticleDTO,
         @Valid @PathVariable("id") id: Int
     ): ResponseEntity<Void> {
-        articleService.updateArticle(id, articleDTO)
+        if(!articleService.checkIfExists(id)){
+            return ResponseEntity.notFound().build()
+        }
+        articleService.updateArticle(articleDTO)
         return ResponseEntity.noContent().build<Void>()
     }
 
     @DeleteMapping("{id}")
-    suspend fun deleteArticle(@PathVariable("id") id: Long): ResponseEntity<Void> {
+    suspend fun deleteArticle(@PathVariable("id") id: Int): ResponseEntity<Void> {
         articleService.deleteArticle(id)
         return ResponseEntity.noContent().build<Void>()
     }
 
     @PostMapping("preview")
     suspend fun getPreview(@RequestBody articlePreviewContent: ArticlePreviewContent): String {
-        return articleService.preview(articlePreviewContent.content)
+        return articleService.renderMarkdownToHtml(articlePreviewContent.content)
+    }
+    @GetMapping("{articleId}/images")
+    suspend fun getImagesOfArticle(@PathVariable("articleId") articleId:Int):List<String>{
+        return articleService.getImagesOfArticle(articleId)
     }
 }

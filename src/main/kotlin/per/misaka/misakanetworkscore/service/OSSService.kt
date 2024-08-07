@@ -85,12 +85,12 @@ class OSSService {
         }
     }
 
-    suspend fun putObject(bucketName: String, key: String, input: InputStream): Deferred<PutObjectResult> {
+    suspend fun putObject(bucketName: OSSBucket, key: String, input: InputStream): Deferred<PutObjectResult> {
         logger.info("Putting object: $bucketName:$key")
         val result = CompletableDeferred<PutObjectResult>()
         submit {
             try {
-                val putResult = ossClient.putObject(bucketName, key, input)
+                val putResult = ossClient.putObject(bucketName.value, key, input)
                 result.complete(putResult)
             } catch (e: Exception) {
                 result.completeExceptionally(e)
@@ -100,12 +100,12 @@ class OSSService {
         return result
     }
 
-    suspend fun deleteObject(bucketName: String, key: String): Deferred<VoidResult> {
-        logger.info("Deleting object: $bucketName:$key")
+    suspend fun deleteObject(bucketName: OSSBucket, key: String): Deferred<VoidResult> {
+        logger.info("Deleting object: $bucketName/$key")
         val result = CompletableDeferred<VoidResult>()
         submit {
             try {
-                val deleteResult = ossClient.deleteObject(bucketName, key)
+                val deleteResult = ossClient.deleteObject(bucketName.toString(), key)
                 result.complete(deleteResult)
             } catch (e: Exception) {
                 result.completeExceptionally(e)
@@ -116,15 +116,15 @@ class OSSService {
     }
 
     suspend fun copyObject(
-        sourceBucketName: String, sourceKey: String,
-        destinationBucketName: String, destinationKey: String
+        sourceBucketName: OSSBucket, sourceKey: String,
+        destinationBucketName: OSSBucket, destinationKey: String
     ): Deferred<CopyObjectResult> {
-        logger.info("copy object from $sourceBucketName/$sourceKey -> $destinationBucketName/$destinationKey")
+        logger.info("copy object from ${sourceBucketName.value}/$sourceKey -> ${destinationBucketName.value}/$destinationKey")
         val result = CompletableDeferred<CopyObjectResult>()
         submit {
             try {
                 val copyResult =
-                    ossClient.copyObject(sourceBucketName, sourceKey, destinationBucketName, destinationKey)
+                    ossClient.copyObject(sourceBucketName.value, sourceKey, destinationBucketName.value, destinationKey)
                 result.complete(copyResult)
             } catch (e: Exception) {
                 result.completeExceptionally(e)

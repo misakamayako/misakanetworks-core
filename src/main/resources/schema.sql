@@ -1,16 +1,37 @@
 create database if not exists MisakaNetworks DEFAULT CHARACTER SET utf8mb4;
 use MisakaNetworks;
-CREATE TABLE article
+create table if not exists article
 (
-    id           INT AUTO_INCREMENT PRIMARY KEY,
-    title        VARCHAR(255) NOT NULL,
-    markdown_url VARCHAR(512) NOT NULL,
-    html_url     VARCHAR(512) NOT NULL,
-    brief        VARCHAR(200) NOT NULL,
-    author       VARCHAR(100) NOT NULL,
-    hasDelete    tinyint(1) default 0,
-    created_at   TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id         int auto_increment primary key,
+    title      varchar(80) unique                   not null,
+    folder     varchar(40)                          not null comment '文章文件夹名称，随机生成',
+    brief      TEXT                                 null,
+    views      int        default 0                 null,
+    author     varchar(100)                         not null,
+    has_delete tinyint(1) default 0                 null,
+    created_at timestamp  default CURRENT_TIMESTAMP null,
+    updated_at timestamp  default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    Index idx_title (title),
+    Index idx_hasDelete (has_delete)
+) comment "文章表" , CHARACTER SET utf8mb4
+                     COLLATE utf8mb4_unicode_ci;
+create table if not exists article_history
+(
+    id         int auto_increment primary key,
+    version    int comment '文章版本号',
+    article    int                                                               not null,
+    created_at timestamp                               default CURRENT_TIMESTAMP null,
+    updated_at timestamp                               default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    status     enum ('draft', 'published', 'archived') default 'published',
+    foreign key (article) references article (id)
+) comment "文章历史记录" CHARACTER SET utf8mb4
+                         COLLATE utf8mb4_unicode_ci;
+
+create table if not exists category
+(
+    id          int primary key auto_increment,
+    description varchar(80) unique not null,
+    type        int                not null comment '标签类型：1 文章，2：图片'
 );
 create table if not exists article_to_category
 (
@@ -19,12 +40,6 @@ create table if not exists article_to_category
     category int,
     foreign key (article) references article (id),
     foreign key (category) references category (id)
-);
-create table if not exists category
-(
-    id          int primary key auto_increment,
-    description varchar(80) unique not null,
-    type        int                not null comment '标签类型，暂定：1 文章，2：图片'
 );
 create table if not exists file_mapping
 (
@@ -87,7 +102,7 @@ create table if not exists file_mapping_of_article
     id           bigint auto_increment primary key,
     bucket       varchar(31)  not null comment 'oss bucket name, don\'t store temp bucket',
     file_key     varchar(255) not null unique,
-    connect_file bigint,
+    connect_file int,
     delete_flag  tinyint(1) default 0,
     CONSTRAINT fk_file_to_article foreign key (connect_file) REFERENCES article (id),
     index (connect_file)

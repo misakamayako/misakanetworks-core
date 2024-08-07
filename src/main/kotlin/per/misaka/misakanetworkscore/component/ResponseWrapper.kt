@@ -31,7 +31,7 @@ class ResponseWrapperAspect {
                 if (data is ResponseEntity<*>) {
                     data
                 } else {
-                    logger.warn("Response body is not a ResponseEntity: ${data.toString()}")
+                    logger.info("Response body is not a ResponseEntity: {}",data)
                     ApiResponse(
                         code = 200,
                         message = "Success",
@@ -39,7 +39,7 @@ class ResponseWrapperAspect {
                     )
                 }
             } else {
-                logger.warn("Response body type is unknown: ${result.toString()}")
+                logger.info("Response as async: {}",result)
                 ApiResponse(
                     code = 200,
                     message = "Success",
@@ -48,7 +48,7 @@ class ResponseWrapperAspect {
             }
 
         }.onErrorResume { ex ->
-            logger.error("find Error ${ex.message}",ex)
+            logger.error("find Error {}",ex.message,ex)
             throw ex
         }
     }

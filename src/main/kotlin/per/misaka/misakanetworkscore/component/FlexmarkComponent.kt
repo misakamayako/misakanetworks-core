@@ -10,6 +10,7 @@ import com.vladsch.flexmark.util.ast.NodeVisitor
 import com.vladsch.flexmark.util.data.MutableDataSet
 import org.springframework.stereotype.Component
 
+
 @Component
 class FlexmarkComponent {
     fun baseOptions(): MutableDataSet {
@@ -31,18 +32,19 @@ class FlexmarkComponent {
         return Parser.builder(options).build()
     }
 
-    fun renderToHtml(content: String, vararg visitor: NodeVisitor): String {
+    fun renderToHtml(content: String, vararg visitor: NodeVisitor?): String {
         return this.renderToHtml(content, null, visitor = visitor)
     }
 
-    fun renderToHtml(content: String, options: MutableDataSet? = null, vararg visitor: NodeVisitor): String {
+    fun renderToHtml(content: String, options: MutableDataSet? = null, vararg visitor: NodeVisitor?): String {
         val parser = parse(options ?: baseOptions())
         val render = HtmlRenderer.builder().build()
         val document = parser.parse(content)
         visitor.forEach {
-            it.visit(document)
+            it?.visit(document)
         }
         val html = render.render(document)
         return html
     }
+
 }

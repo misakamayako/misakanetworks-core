@@ -5,6 +5,8 @@ import com.aliyun.auth.credentials.provider.StaticCredentialProvider
 import com.aliyun.sdk.service.sts20150401.AsyncClient
 import com.aliyun.sdk.service.sts20150401.models.AssumeRoleRequest
 import com.aliyun.sdk.service.sts20150401.models.AssumeRoleResponseBody
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
 import darabonba.core.client.ClientOverrideConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,7 +21,23 @@ class AssumeRole {
     @Autowired
     private lateinit var applicationConfig: ApplicationConfig
 
-    private val logger =  LoggerFactory.getLogger(this::class.java)
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
+    internal data class Policy(
+        @get:JsonProperty("Version")
+        val version: String,
+        @get:JsonProperty("Statement")
+        val statement: ArrayList<Statement>
+    )
+
+    internal data class Statement(
+        @get:JsonProperty("Action")
+        val action: List<String>,
+        @get:JsonProperty("Effect")
+        val effect: String,
+        @get:JsonProperty("Resource")
+        val resource: List<String>
+    )
 
     suspend fun getAliAssumeRole(): AssumeRoleResponseBody.Credentials? {
         val provider = StaticCredentialProvider.create(
@@ -36,15 +54,24 @@ class AssumeRole {
                     .setEndpointOverride("sts.cn-shanghai.aliyuncs.com")
             )
             .build()
-        val policy =
-            "{\"Version\":\"1\",\"Statement\":[{\"Action\":[\"oss:PutObject\",\"oss:GetObject\"],\"Resource\":[\"acs:oss:*:*:${OSSBucket.Temp.value}/*\"],\"Effect\":\"Allow\"}]}"
-        logger.info("new auth:$policy")
+        val policy = Policy("1", arrayListOf())
+        policy.statement.add(
+            Statement(
+                listOf("oss:PutObject", "oss:GetObject"),
+                "Allow",
+                listOf("acs:oss:*:*:${OSSBucket.Temp}/*")
+            )
+        )
+        policy.statement.add(Statement(listOf("oss:GetObject"), "Allow", listOf("acs:oss:*:*:${OSSBucket.Article}/*")))
+        val objectMapper = ObjectMapper()
+        val policyString = objectMapper.writeValueAsString(policy)
+        logger.info("new auth:{}", policyString)
         val assumeRoleRequest =
             AssumeRoleRequest.builder()
                 .roleSessionName("3333")
                 .durationSeconds(3600L)
                 .roleArn(applicationConfig.tempRole)
-                .policy(policy)
+                .policy(policyString)
                 .build()
         return try {
             withContext(Dispatchers.IO) {

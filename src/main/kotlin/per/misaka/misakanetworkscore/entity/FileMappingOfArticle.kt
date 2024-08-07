@@ -9,11 +9,13 @@ data class FileMappingOfArticle(
     val bucket:String,
     @Column("file_key")
     val fileKey:String,
+
+    @Column("connect_file")
+    var connectFile:Int?=null,
+
     @Column("delete_flag")
     val deleteFlag:Boolean=false,
 
     @Id
-    var id:Long?=null,
-    @Column("connect_file")
-    var connectFile:Long?=null,
+    var id:Int?=null,
 )

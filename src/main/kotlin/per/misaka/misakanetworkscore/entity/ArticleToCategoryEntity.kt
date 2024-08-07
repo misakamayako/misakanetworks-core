@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table
 @Table("article_to_category")
 data class ArticleToCategoryEntity(
     @Column("article")
-    val article: Long,
+    val article: Int,
     @Column("category")
     val category: Int,
 )
