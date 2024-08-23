@@ -5,7 +5,11 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import per.misaka.misakanetworkscore.dto.*
+import per.misaka.misakanetworkscore.dto.ArticleDTO
+import per.misaka.misakanetworkscore.dto.ArticlePreviewContent
+import per.misaka.misakanetworkscore.dto.PageResultDTO
+import per.misaka.misakanetworkscore.dto.QueryResultArticleDTO
+import per.misaka.misakanetworkscore.exception.BadRequestException
 import per.misaka.misakanetworkscore.service.ArticleService
 
 @RestController
@@ -33,9 +37,9 @@ class ArticleController {
 
     @GetMapping("{id}")
     suspend fun getArticleDetail(
-        @Valid @PathVariable("id") id:Int
+        @Valid @PathVariable("id") id: Int
     ): QueryResultArticleDTO? {
-        return  articleService.getArticleDetail(id)
+        return articleService.getArticleDetail(id)
     }
 
     @PutMapping("{id}")
@@ -43,7 +47,10 @@ class ArticleController {
         @Valid @RequestBody articleDTO: ArticleDTO,
         @Valid @PathVariable("id") id: Int
     ): ResponseEntity<Void> {
-        if(!articleService.checkIfExists(id)){
+        if (articleDTO.id != id) {
+            throw BadRequestException("文章id:${articleDTO.id}与路径id:${id}不统一")
+        }
+        if (!articleService.checkIfExists(id)) {
             return ResponseEntity.notFound().build()
         }
         articleService.updateArticle(articleDTO)
@@ -60,8 +67,9 @@ class ArticleController {
     suspend fun getPreview(@RequestBody articlePreviewContent: ArticlePreviewContent): String {
         return articleService.renderMarkdownToHtml(articlePreviewContent.content)
     }
+
     @GetMapping("{articleId}/images")
-    suspend fun getImagesOfArticle(@PathVariable("articleId") articleId:Int):List<String>{
+    suspend fun getImagesOfArticle(@PathVariable("articleId") articleId: Int): List<String> {
         return articleService.getImagesOfArticle(articleId)
     }
 }

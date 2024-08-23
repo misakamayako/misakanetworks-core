@@ -7,6 +7,7 @@ import com.aliyun.oss.OSSException
 import com.aliyun.oss.common.comm.Protocol
 import com.aliyun.oss.model.CopyObjectResult
 import com.aliyun.oss.model.OSSObject
+import com.aliyun.oss.model.ObjectMetadata
 import com.aliyun.oss.model.PutObjectResult
 import com.aliyun.oss.model.VoidResult
 import jakarta.annotation.PostConstruct
@@ -85,12 +86,12 @@ class OSSService {
         }
     }
 
-    suspend fun putObject(bucketName: OSSBucket, key: String, input: InputStream): Deferred<PutObjectResult> {
+    suspend fun putObject(bucketName: OSSBucket, key: String, input: InputStream,metaData:ObjectMetadata?=null): Deferred<PutObjectResult> {
         logger.info("Putting object: $bucketName:$key")
         val result = CompletableDeferred<PutObjectResult>()
         submit {
             try {
-                val putResult = ossClient.putObject(bucketName.value, key, input)
+                val putResult = ossClient.putObject(bucketName.value, key, input,metaData)
                 result.complete(putResult)
             } catch (e: Exception) {
                 result.completeExceptionally(e)

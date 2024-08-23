@@ -68,4 +68,13 @@ where a.has_delete = 0 and ah.status = 'published' and a.id = :id
 group by a.id
     """)
     fun getArticleDetail(id: Int):Mono<QueryResultArticleDTO?>
+
+    @Modifying
+    @Query("""
+insert into article(id,views,title, author, folder)
+    values
+    (:id,:increase,'','','')
+on duplicate key update views = views + VALUES(views);
+    """)
+    fun increaseViews(@Param("id") id:Int,@Param("increase") increase:Int):Mono<Int>
 }

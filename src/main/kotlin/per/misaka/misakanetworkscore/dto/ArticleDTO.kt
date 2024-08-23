@@ -21,7 +21,6 @@ data class ArticleDTO(
     val content: String,
     val brief: String,
     val author: String?,
-    @field:JsonIgnore
     val id: Int? = null,
     val views: Int? = 0
 )

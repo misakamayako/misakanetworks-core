@@ -25,6 +25,7 @@ import per.misaka.misakanetworkscore.repository.ArticleRepository
 import per.misaka.misakanetworkscore.repository.ArticleToCategoryRepository
 import per.misaka.misakanetworkscore.repository.FileMappingOfArticleRepository
 import per.misaka.misakanetworkscore.utils.ImageSourceReplacer
+import per.misaka.misakanetworkscore.utils.gzipFile
 import java.time.LocalDateTime
 import java.util.*
 
@@ -115,13 +116,13 @@ class ArticleServiceImpl : ArticleService {
         ossTask += listOf(
             localOSSService.putObject(
                 OSSBucket.Article,
-                "$folder/v1.md",
-                content.byteInputStream()
+                "$folder/v1.md.gz",
+                gzipFile(content.byteInputStream())
             ),
             localOSSService.putObject(
                 OSSBucket.Article,
-                "$folder/v1.fragment",
-                html.byteInputStream()
+                "$folder/v1.fragment.gz",
+                gzipFile(html.byteInputStream())
             )
         )
         ossTask.joinAll()
@@ -134,7 +135,7 @@ class ArticleServiceImpl : ArticleService {
         val oldDataArticleEntity =
             articleRepository.findById(mainId).awaitSingleOrNull() ?: throw NotFoundException()
         //删除就类型记录
-        articleToCategoryRepository.deleteAllByArticle(mainId).awaitSingle()
+        articleToCategoryRepository.deleteAllByArticle(mainId).awaitSingleOrNull()
 
         val oldHistory = articleHistoryRepository
             .findArticleHistoryByArticleAndStatusIs(mainId, ArticleStatus.published)
@@ -149,7 +150,7 @@ class ArticleServiceImpl : ArticleService {
             .let(articleHistoryRepository::save)
             .awaitSingle()
         //新记录
-        val newRecord = oldHistory.copy(version = oldHistory.version + 1)
+        val newRecord = oldHistory.copy(version = oldHistory.version + 1, id = null)
             .let(articleHistoryRepository::save)
             .awaitSingle()
         //保存新的分类
@@ -183,6 +184,19 @@ class ArticleServiceImpl : ArticleService {
             .toList()
             .let(fileMappingOfArticleRepository::deleteAllByFileKeyIn)
             .awaitSingleOrNull()
+        //保存新的图片关系
+        if (img.isNotEmpty()) {
+            img.map { (_, newPath) ->
+                FileMappingOfArticle(
+                    bucket = OSSBucket.Article.value,
+                    fileKey = newPath,
+                    connectFile = mainId,
+                    deleteFlag = false,
+                )
+            }
+                .let(fileMappingOfArticleRepository::saveAll)
+                .then().awaitSingleOrNull()
+        }
         if (count != needRemove.size) {
             log.error(
                 "删除mainId:{},version:{}时，数量不正确,应删除{},实际删除{}",
@@ -201,13 +215,13 @@ class ArticleServiceImpl : ArticleService {
         ossTask += listOf(
             localOSSService.putObject(
                 OSSBucket.Article,
-                "$folder/v${newRecord.version}.md",
-                content.byteInputStream()
+                "$folder/v${newRecord.version}.md.gz",
+                gzipFile(content.byteInputStream())
             ),
             localOSSService.putObject(
                 OSSBucket.Article,
-                "$folder/v${newRecord.version}.fragment",
-                html.byteInputStream()
+                "$folder/v${newRecord.version}.fragment.gz",
+                gzipFile(html.byteInputStream())
             )
         )
         ossTask.joinAll()
@@ -223,7 +237,7 @@ class ArticleServiceImpl : ArticleService {
     }
 
     override suspend fun queryArticleList(page: Int, pageSize: Int): PageResultDTO<QueryResultArticleDTO?> {
-        val recordTask = articleRepository.findAllArticle(page, pageSize * (page - 1)).collectList()
+        val recordTask = articleRepository.findAllArticle(pageSize, pageSize * (page - 1)).collectList()
         val totalTask = articleRepository.getCount()
         return PageResultDTO(
             list = recordTask.awaitSingleOrNull(),
