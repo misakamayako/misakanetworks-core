@@ -6,10 +6,12 @@ import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
+import org.aspectj.lang.reflect.MethodSignature
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import per.misaka.misakanetworkscore.annotation.NoReturnLog
 import per.misaka.misakanetworkscore.dto.ApiResponse
 import reactor.core.publisher.Mono
 
@@ -24,14 +26,16 @@ class ResponseWrapperAspect {
 
     @Around("controllerMethods()")
     fun wrapResponse(joinPoint: ProceedingJoinPoint): Mono<Any?> {
+        val methodSignature = joinPoint.signature as MethodSignature
+        val method = methodSignature.method
+        val showLog = !method.isAnnotationPresent(NoReturnLog::class.java)
+        val result: Any? = joinPoint.proceed()
         return mono {
-            val result: Any? = joinPoint.proceed()
-            if (result is Mono<*>?) {
-                val data: Any? = result?.awaitSingleOrNull()
+            val wrappedResponse = if (result is Mono<*>) {
+                val data = result.awaitSingleOrNull()
                 if (data is ResponseEntity<*>) {
                     data
                 } else {
-                    logger.info("Response body is not a ResponseEntity: {}",data)
                     ApiResponse(
                         code = 200,
                         message = "Success",
@@ -39,7 +43,6 @@ class ResponseWrapperAspect {
                     )
                 }
             } else {
-                logger.info("Response as async: {}",result)
                 ApiResponse(
                     code = 200,
                     message = "Success",
@@ -47,8 +50,12 @@ class ResponseWrapperAspect {
                 )
             }
 
+            if (showLog) {
+                logger.info("Method {} returned response: {}", method.name, wrappedResponse)
+            }
+            wrappedResponse
         }.onErrorResume { ex ->
-            logger.error("find Error {}",ex.message,ex)
+            logger.error("Error occurred in method {}: {}", method.name, ex.message, ex)
             throw ex
         }
     }

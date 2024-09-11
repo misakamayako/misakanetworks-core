@@ -1,109 +1,115 @@
-create database if not exists MisakaNetworks DEFAULT CHARACTER SET utf8mb4;
-use MisakaNetworks;
-create table if not exists article
-(
-    id         int auto_increment primary key,
-    title      varchar(80) unique                   not null,
-    folder     varchar(40)                          not null comment '文章文件夹名称，随机生成',
-    brief      TEXT                                 null,
-    views      int        default 0                 null,
-    author     varchar(100)                         not null,
-    has_delete tinyint(1) default 0                 null,
-    created_at timestamp  default CURRENT_TIMESTAMP null,
-    updated_at timestamp  default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    Index idx_title (title),
-    Index idx_hasDelete (has_delete)
-) comment "文章表" , CHARACTER SET utf8mb4
-                     COLLATE utf8mb4_unicode_ci;
-create table if not exists article_history
-(
-    id         int auto_increment primary key,
-    version    int comment '文章版本号',
-    article    int                                                               not null,
-    created_at timestamp                               default CURRENT_TIMESTAMP null,
-    updated_at timestamp                               default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    status     enum ('draft', 'published', 'archived') default 'published',
-    foreign key (article) references article (id)
-) comment "文章历史记录" CHARACTER SET utf8mb4
-                         COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS MisakaNetworks DEFAULT CHARACTER SET utf8mb4;
+USE MisakaNetworks;
 
-create table if not exists category
+CREATE TABLE IF NOT EXISTS article
 (
-    id          int primary key auto_increment,
-    description varchar(80) unique not null,
-    type        int                not null comment '标签类型：1 文章，2：图片'
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    title      VARCHAR(80) UNIQUE NOT NULL,
+    folder     VARCHAR(40)        NOT NULL COMMENT '文章文件夹名称，随机生成',
+    brief      TEXT,
+    views      INT        DEFAULT 0,
+    author     VARCHAR(100)       NOT NULL,
+    has_delete TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_title (title),
+    INDEX idx_hasDelete (has_delete)
+) COMMENT = '文章表'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS article_history
+(
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    version    INT COMMENT '文章版本号',
+    article    INT NOT NULL,
+    created_at TIMESTAMP                               DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP                               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    status     ENUM ('draft', 'published', 'archived') DEFAULT 'published',
+    FOREIGN KEY (article) REFERENCES article (id)
+) COMMENT = '文章历史记录'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS category
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(80) UNIQUE               NOT NULL,
+    type        ENUM ('article','image','album') NOT NULL COMMENT '标签类型'
+) COMMENT = '标签数据'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS article_to_category
+(
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    article  INT,
+    category INT,
+    FOREIGN KEY (article) REFERENCES article (id),
+    FOREIGN KEY (category) REFERENCES category (id)
 );
-create table if not exists article_to_category
+
+CREATE TABLE IF NOT EXISTS users
 (
-    id       int primary key auto_increment,
-    article  int,
-    category int,
-    foreign key (article) references article (id),
-    foreign key (category) references category (id)
-);
-create table if not exists file_mapping
-(
-    id          int auto_increment primary key,
-    eigenvalues varchar(64) not null unique,
-    real_name   varchar(126) default null,
-    create_at   datetime    not null,
-    delete_flag bool         default false
-);
-create table if not exists album
-(
-    id      int primary key auto_increment,
-    title   varchar(20) not null,
-    cover   varchar(120),
-    grading int  default 1 comment '1：健全，2：16x,3:18x',
-    private bool default false
-);
-create table if not exists album_to_category
-(
-    id          int primary key auto_increment,
-    album_id    int not null,
-    category_id int not null,
-    foreign key (album_id) references album (id),
-    foreign key (category_id) references category (id)
-);
-create table if not exists img
-(
-    id          int primary key auto_increment,
-    eigenvalues varchar(64) not null unique,
-    name        varchar(64) not null,
-    grading     int  default 1 comment '1：健全，2：16x,3:18x',
-    private     bool default false,
-    album       int  default null,
-    foreign key (album) references album (id)
-);
-create table if not exists img_to_category
-(
-    id          int primary key auto_increment,
-    img_id      int not null,
-    category_id int not null,
-    foreign key (img_id) references img (id),
-    foreign key (category_id) references category (id)
-);
-CREATE TABLE if not exists users
-(
-    id       int primary key auto_increment,
-    username VARCHAR(50)  NOT NULL unique,
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50)  NOT NULL UNIQUE,
     password VARCHAR(500) NOT NULL,
     enabled  BOOLEAN      NOT NULL,
     UNIQUE INDEX ix_auth_username (username)
 );
-CREATE TABLE if not exists authorities
+
+CREATE TABLE IF NOT EXISTS authorities
 (
-    userId    int         NOT NULL,
+    userId    INT         NOT NULL,
     authority VARCHAR(50) NOT NULL,
     CONSTRAINT fk_authorities_users FOREIGN KEY (userId) REFERENCES users (id)
 );
-create table if not exists file_mapping_of_article
+
+CREATE TABLE IF NOT EXISTS file_mapping_of_article
 (
-    id           bigint auto_increment primary key,
-    bucket       varchar(31)  not null comment 'oss bucket name, don\'t store temp bucket',
-    file_key     varchar(255) not null unique,
-    connect_file int,
-    delete_flag  tinyint(1) default 0,
-    CONSTRAINT fk_file_to_article foreign key (connect_file) REFERENCES article (id),
-    index (connect_file)
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    bucket       VARCHAR(31)  NOT NULL COMMENT 'oss bucket name, don\'t store temp bucket',
+    file_key     VARCHAR(255) NOT NULL UNIQUE,
+    connect_file INT,
+    delete_flag  TINYINT(1) DEFAULT 0,
+    CONSTRAINT fk_file_to_article FOREIGN KEY (connect_file) REFERENCES article (id),
+    INDEX (connect_file)
 );
+
+CREATE TABLE IF NOT EXISTS images
+(
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    oss_key     VARCHAR(255) NOT NULL COMMENT '文件的oss key',
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    upload_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    has_delete  TINYINT               DEFAULT 0 COMMENT '是否已删除'
+) COMMENT = '非在文章中使用的图片数据'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS albums
+(
+    id                        INT AUTO_INCREMENT PRIMARY KEY,
+    name                      VARCHAR(255) NOT NULL UNIQUE COMMENT '相册名称',
+    description               TEXT COMMENT '描述',
+    cover_id                  INT       DEFAULT NULL COMMENT '相册图片id',
+    create_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_private                TINYINT   DEFAULT 0 COMMENT '相册是否私有，图片继承这个属性',
+    contains_explicit_content TINYINT   DEFAULT 0,
+    has_delete                TINYINT   DEFAULT 0 COMMENT '是否已删除',
+    CONSTRAINT fk_cover_id FOREIGN KEY (cover_id) REFERENCES images (id) ON DELETE SET NULL
+) COMMENT = '相册数据'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS albums_to_category
+(
+    album_id    INT NOT NULL,
+    category_id INT NOT NULL,
+    CONSTRAINT fk_album_id FOREIGN KEY (album_id) REFERENCES albums (id) ON DELETE CASCADE,
+    CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE CASCADE
+) COMMENT = '相册和类型的联系'
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;

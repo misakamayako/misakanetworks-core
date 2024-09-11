@@ -27,7 +27,6 @@ class ScheduledTasks {
     fun saveViewsToDataBase() {
         logger.info("start collect views data and save to database")
         val keys = redisService.getKeys("article:views:articleId:*")
-        println(keys)
         if (keys.isNullOrEmpty()) {
             logger.info("no data for update")
             return
@@ -40,6 +39,7 @@ class ScheduledTasks {
                         val id = key.split(":").last()
                         val value = redisService.getEntity("article:views:articleId:$id", Int::class)
                         logger.info("article {} have {} views", id, value)
+                        redisService.removeEntity(key)
                         articleRepository.increaseViews(id.toInt(), value ?: 0)
                     }
                     `when`(forUpdate).block()
@@ -49,9 +49,6 @@ class ScheduledTasks {
         } catch (ex: Exception) {
             logger.error("update failed, restart at next 00:00, error is:", ex)
             throw ex
-        }
-        keys.forEach { key ->
-            redisService.removeEntity(key)
         }
     }
 }

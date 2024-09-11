@@ -129,7 +129,8 @@ class OSSService {
                 result.complete(copyResult)
             } catch (e: Exception) {
                 result.completeExceptionally(e)
-                logger.error("copyObject error: ${e.message}",e)
+                logger.error("copy object from ${sourceBucketName.value}/$sourceKey -> ${destinationBucketName.value}/$destinationKey")
+                logger.error("copy object error: ${e.message}",e)
             }
         }
         return result

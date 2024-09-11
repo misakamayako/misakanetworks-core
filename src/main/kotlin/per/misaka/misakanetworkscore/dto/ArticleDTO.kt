@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull
+import per.misaka.misakanetworkscore.enums.CategoryType
 import java.time.LocalDateTime
 
 
@@ -26,7 +27,7 @@ data class ArticleDTO(
 )
 
 data class ArticlePreviewContent(val content: String)
-data class QueryResultArticleDTO(
+data class ArticleDetailDTO(
     val id: Int,
     val title: String,
     val markdownUrl: String?,
@@ -48,21 +49,20 @@ data class QueryResultArticleDTO(
             val ids = categories?.split(",") ?: emptyList()
             val strings = categoryTypes?.split(",") ?: emptyList()
             return ids.zip(strings) { id, type ->
-                CategoryDTO(type, id.toInt(), 2)
+                CategoryDTO(type, id.toInt(), CategoryType.Article)
             }
         }
 }
 
-data class ArticleDetailDTO(
+data class ArticleBrief(
     val id: Int,
     val title: String,
-    val brief: String?,
-    var content: String,
-    var categories: List<Int>? = null,
-    var imgList: List<String>? = null
-) {
-    init {
-        if (categories == null) categories = emptyList()
-        if (imgList == null) imgList = emptyList()
-    }
+    val version: Int,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val createdAt: LocalDateTime?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val updatedAt: LocalDateTime?,
+){
+    @field:JsonProperty
+    var views: Int = 0
 }

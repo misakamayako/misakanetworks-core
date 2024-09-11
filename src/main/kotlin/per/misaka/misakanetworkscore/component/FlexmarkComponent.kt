@@ -1,34 +1,34 @@
 package per.misaka.misakanetworkscore.component
 
-import com.vladsch.flexmark.ext.autolink.AutolinkExtension
 import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.ext.toc.TocExtension
-import com.vladsch.flexmark.ext.typographic.TypographicExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.util.ast.KeepType
 import com.vladsch.flexmark.util.ast.NodeVisitor
+import com.vladsch.flexmark.util.data.DataSet
 import com.vladsch.flexmark.util.data.MutableDataSet
+import com.vladsch.flexmark.util.misc.Extension
 import org.springframework.stereotype.Component
-
+import java.util.List
 
 @Component
 class FlexmarkComponent {
-    fun baseOptions(): MutableDataSet {
+    fun baseOptions(): DataSet {
         return MutableDataSet()
-            .set(
-                Parser.EXTENSIONS, listOf(
-                    AutolinkExtension.create(),
-                    TablesExtension.create(),
-                    TypographicExtension.create(),
-                    TocExtension.create()
-                )
-            )
-            .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
-            .set(HtmlRenderer.PERCENT_ENCODE_URLS, true)
+            .set<KeepType?>(Parser.REFERENCES_KEEP, KeepType.LAST)
+            .set<Int?>(HtmlRenderer.INDENT_SIZE, 2)
+            .set<Boolean?>(HtmlRenderer.PERCENT_ENCODE_URLS, true)
+            .set<Boolean?>(TablesExtension.COLUMN_SPANS, false)
+            .set<Boolean?>(TablesExtension.APPEND_MISSING_COLUMNS, true)
+            .set<Boolean?>(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+            .set<Boolean?>(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
+            .set<MutableCollection<Extension?>?>(Parser.EXTENSIONS, List.of<Extension?>(TablesExtension.create(),TocExtension.create()))
+            .toImmutable();
 
     }
 
-    private fun parse(options: MutableDataSet?): Parser {
+    private fun parse(options: DataSet): Parser {
         return Parser.builder(options).build()
     }
 
@@ -36,9 +36,10 @@ class FlexmarkComponent {
         return this.renderToHtml(content, null, visitor = visitor)
     }
 
-    fun renderToHtml(content: String, options: MutableDataSet? = null, vararg visitor: NodeVisitor?): String {
-        val parser = parse(options ?: baseOptions())
-        val render = HtmlRenderer.builder().build()
+    fun renderToHtml(content: String, options: DataSet? = null, vararg visitor: NodeVisitor?): String {
+        val dataSet = options ?: baseOptions()
+        val parser = parse(dataSet)
+        val render = HtmlRenderer.builder(dataSet).build()
         val document = parser.parse(content)
         visitor.forEach {
             it?.visit(document)
@@ -46,5 +47,4 @@ class FlexmarkComponent {
         val html = render.render(document)
         return html
     }
-
 }

@@ -5,10 +5,12 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import per.misaka.misakanetworkscore.annotation.NoReturnLog
+import per.misaka.misakanetworkscore.dto.ArticleBrief
 import per.misaka.misakanetworkscore.dto.ArticleDTO
 import per.misaka.misakanetworkscore.dto.ArticlePreviewContent
 import per.misaka.misakanetworkscore.dto.PageResultDTO
-import per.misaka.misakanetworkscore.dto.QueryResultArticleDTO
+import per.misaka.misakanetworkscore.dto.ArticleDetailDTO
 import per.misaka.misakanetworkscore.exception.BadRequestException
 import per.misaka.misakanetworkscore.service.ArticleService
 
@@ -30,15 +32,17 @@ class ArticleController {
     @GetMapping("")
     suspend fun queryArticle(
         @RequestParam(value = "page", required = false) page: Int = 1,
-        @RequestParam(value = "pageSize", required = false) pageSize: Int = 10
-    ): PageResultDTO<QueryResultArticleDTO?> {
-        return articleService.queryArticleList(page, pageSize)
+        @RequestParam(value = "pageSize", required = false) pageSize: Int = 10,
+        @RequestParam(value="title", required = false) title:String?=null,
+        @RequestParam(value="categories", required = false) categories:List<Int>?=null,
+    ): PageResultDTO<ArticleBrief?> {
+        return articleService.queryArticleList(page, pageSize,title.takeIf { !it.isNullOrEmpty() },categories)
     }
 
     @GetMapping("{id}")
     suspend fun getArticleDetail(
         @Valid @PathVariable("id") id: Int
-    ): QueryResultArticleDTO? {
+    ): ArticleDetailDTO? {
         return articleService.getArticleDetail(id)
     }
 
@@ -63,6 +67,7 @@ class ArticleController {
         return ResponseEntity.noContent().build<Void>()
     }
 
+    @NoReturnLog
     @PostMapping("preview")
     suspend fun getPreview(@RequestBody articlePreviewContent: ArticlePreviewContent): String {
         return articleService.renderMarkdownToHtml(articlePreviewContent.content)
