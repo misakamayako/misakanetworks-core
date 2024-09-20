@@ -6,7 +6,7 @@
 	"remoteUser": "vscode",
 	"forwardPorts": [8080, 5005],
 	"shutdownAction": "none",
-	customizations: {
+	"customizations": {
 		"jetbrains" : {
 			"settings" : {
 				"com.intellij:app:BuiltInServerOptions.builtInServerPort": 61735,
