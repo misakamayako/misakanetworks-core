@@ -1,16 +1,11 @@
 package per.misaka.misakanetworkscore.service
 
-import com.aliyun.core.utils.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import per.misaka.misakanetworkscore.component.AssumeRole
 import per.misaka.misakanetworkscore.dto.STSDTO
 import per.misaka.misakanetworkscore.exception.InternalServerException
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
-import java.util.zip.GZIPOutputStream
 
 @Service
 class FileService {

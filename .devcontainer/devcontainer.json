@@ -1,0 +1,17 @@
+{
+	"name": "Kotlin + Spring + JetBrains Dev Container",
+	"dockerFile": "Dockerfile",
+	"context": "..",
+	"postCreateCommand": "./gradlew clean build",
+	"remoteUser": "vscode",
+	"forwardPorts": [8080, 5005],
+	"shutdownAction": "none",
+	customizations: {
+		"jetbrains" : {
+			"settings" : {
+				"com.intellij:app:BuiltInServerOptions.builtInServerPort": 61735,
+				"com.intellij:app:HttpConfigurable.use_proxy_pac": true,
+			},
+		},
+	}
+}

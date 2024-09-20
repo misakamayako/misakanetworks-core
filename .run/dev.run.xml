@@ -4,8 +4,27 @@
     <option name="SCHEDULED_DEBUGGER" value="true" />
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="misakanetworks-core.main" />
-    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="per.misaka.misakanetworkscore.MisakaNetworksCoreApplication" />
+    <projectPathOnTarget name="projectPathOnTarget" value="{exitCode=0, timeout=false, cancelled=false, stdout=/tmp/tmp.tyJcoVkTLk , stderr=}/misakanetworks-core" />
+    <target name="WSL - Ubuntu-24.04" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="per.misaka.misakanetworkscore.MisakaNetworksCoreApplicationKt" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="per.misaka.misakanetworkscore.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+  <configuration default="false" name="dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="SCHEDULED_DEBUGGER" value="true" />
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <module name="misakanetworks-core.main" />
+    <projectPathOnTarget name="projectPathOnTarget" value="{exitCode=0, timeout=false, cancelled=false, stdout=/tmp/tmp.tyJcoVkTLk , stderr=}/misakanetworks-core" />
+    <target name="WSL - Ubuntu-24.04" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="per.misaka.misakanetworkscore.MisakaNetworksCoreApplicationKt" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="per.misaka.misakanetworkscore.*" />

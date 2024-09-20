@@ -62,5 +62,5 @@ on duplicate key update views = views + VALUES(views);
     """)
     fun increaseViews(@Param("id") id:Int,@Param("increase") increase:Int):Mono<Int>
 }
-
+@Repository
 interface ArticleRepository: BaseArticleRepository,WithDynamicArticleR2dbc

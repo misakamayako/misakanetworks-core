@@ -73,7 +73,7 @@ kotlin {
         jvmTarget.set(JvmTarget.JVM_21)
     }
 }
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+//
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}

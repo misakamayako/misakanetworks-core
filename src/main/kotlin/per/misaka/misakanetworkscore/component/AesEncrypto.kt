@@ -3,7 +3,7 @@ package per.misaka.misakanetworkscore.component
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import per.misaka.misakanetworkscore.ApplicationConfig
+import per.misaka.misakanetworkscore.config.ApplicationConfig
 import java.nio.charset.StandardCharsets
 import java.security.spec.KeySpec
 import java.util.*

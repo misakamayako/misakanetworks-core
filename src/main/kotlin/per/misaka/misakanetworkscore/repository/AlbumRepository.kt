@@ -21,4 +21,5 @@ from albums a
     fun getAlbumList(limit: Int, offset: Int): Flux<AlbumBrief>
 }
 
+@Repository
 interface AlbumRepository : AlbumRepositoryBase, WithDynamicAlbumRepository

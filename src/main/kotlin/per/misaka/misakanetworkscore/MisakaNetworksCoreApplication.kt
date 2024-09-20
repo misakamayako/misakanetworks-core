@@ -12,13 +12,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 @EnableAsync
 @EnableAspectJAutoProxy
 @EnableScheduling
-class MisakaNetworksCoreApplication{
-    companion object{
-        @JvmStatic
-        fun main(args: Array<String>) {
-            // 阿里云默认xml解析有问题，需要替换
-            System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl")
-            runApplication<MisakaNetworksCoreApplication>(*args)
-        }
-    }
+class MisakaNetworksCoreApplication
+
+fun main(args: Array<String>) {
+    // 阿里云默认xml解析有问题，需要替换
+    System.setProperty("javax.xml.parsers.SAXParserFactory", "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl")
+    runApplication<MisakaNetworksCoreApplication>(*args)
 }

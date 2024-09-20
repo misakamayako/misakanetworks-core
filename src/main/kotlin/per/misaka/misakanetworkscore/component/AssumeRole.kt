@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import per.misaka.misakanetworkscore.ApplicationConfig
+import per.misaka.misakanetworkscore.config.ApplicationConfig
 import per.misaka.misakanetworkscore.constants.OSSBucket
 
 @Component
