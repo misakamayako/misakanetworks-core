@@ -20,7 +20,7 @@ class CustomerJWTAuthenticationFilter : OncePerRequestFilter() {
     @Autowired
     private lateinit var tokenService: TokenService
 
-    private val logger:Logger = LoggerFactory.getLogger(this::class.java)
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -28,14 +28,18 @@ class CustomerJWTAuthenticationFilter : OncePerRequestFilter() {
         filterChain: FilterChain
     ) {
         val user = tokenService.getLoginUser(request)
-        logger.info("attempt user:{}",user)
+        if (user != null) {
+            log.info("attempt user:{}", user)
+        }
         if (user != null && SecurityContextHolder.getContext().authentication == null) {
             val token = CustomerUsernamePasswordAuthenticationToken.authenticated(
-                user, user.password,
-                user.authorities as Collection<GrantedAuthority>?
+                user, "",
+                emptyList()//TODO get from database
             )
             token.details = WebAuthenticationDetailsSource().buildDetails((request))
             SecurityContextHolder.getContext().authentication = token
+        } else {
+            log.debug("unAuthentication or login request with cookie {}", request.cookies)
         }
         filterChain.doFilter(request, response)
     }

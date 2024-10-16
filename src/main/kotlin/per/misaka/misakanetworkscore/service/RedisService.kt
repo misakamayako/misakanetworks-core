@@ -20,6 +20,7 @@ class RedisService {
     // 存储任意类型的实体对象
     fun <T : Any> saveEntity(entity: T, key: String, timeout: Long? = null, unit: TimeUnit? = null) {
         val value = convertToString(entity)
+        log.info("stored, key:{},value:{}",key,value)
         if (timeout != null && unit != null) {
             redisTemplate.opsForValue().set(key, value, timeout, unit)
         } else {

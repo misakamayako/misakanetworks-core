@@ -1,19 +1,17 @@
 {
-	"name": "Kotlin + Spring + JetBrains Dev Container",
-	"dockerFile": "../Dockerfile",
-	"context": "..",
-	"postCreateCommand": "./gradlew clean build",
-	"remoteUser": "misaka",
-	"forwardPorts": [8080, 5005],
-	"shutdownAction": "none",
-	"customizations": {
-		"jetbrains" : {
-			"settings" : {
-				"Docker:app:DockerSettings.dockerComposePath": "/mnt/c/Program Files/Docker/Docker/resources/bin/docker",
-				"Docker:app:DockerSettings.dockerPath": "/mnt/c/Program Files/Docker/Docker/resources/bin/docker",
-				"com.intellij:app:BuiltInServerOptions.builtInServerPort": 61735,
-				"com.intellij:app:HttpConfigurable.use_proxy_pac": true
-			},
-		},
-	}
+	"name": "Kotlin Dev Container",
+	"build": {
+		"dockerfile": "./Dockerfile",
+		"context": ".."
+	},
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+	"runArgs": [
+		"--volume=${localWorkspaceFolder}:/workspace"
+	],
+	"remoteUser": "root",
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+	]
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotNull
 import per.misaka.misakanetworkscore.enums.CategoryType
 import java.time.LocalDateTime
+import kotlin.Int
 
 
 data class ArticleUploadDTO(

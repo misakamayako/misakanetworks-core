@@ -13,7 +13,6 @@ data class LoginUser(
         return authorities
     }
 
-    //    @get:JsonProperty
     override fun getPassword(): String? {
         return user.password
     }
@@ -29,7 +28,6 @@ data class LoginUser(
     override fun isAccountNonLocked(): Boolean {
         return !user.isAccountNonLocked
     }
-
 //    @JSONField(serialize = false)
 //    @Override
 //    public boolean isCredentialsNonExpired()

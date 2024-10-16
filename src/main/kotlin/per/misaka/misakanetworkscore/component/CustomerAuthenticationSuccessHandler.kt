@@ -25,8 +25,8 @@ class CustomerAuthenticationSuccessHandler : AuthenticationSuccessHandler {
         authentication: Authentication?
     ) {
         if (request == null || response == null) return
-        val user = authentication?.principal as? LoginUser ?: return
-        val token = tokenService.storeUserDetail(user, 3600)
+        val user = authentication?.principal as? Int ?: return
+        val token = tokenService.storeUserDetail(user)
         val name = ("__Secure-".takeIf { request.isSecure } ?: "") + CookieFor.Token.toString()
         val cookie = Cookie(name, token)
         with(cookie) {
@@ -36,6 +36,6 @@ class CustomerAuthenticationSuccessHandler : AuthenticationSuccessHandler {
             path = "/"
         }
         response.addCookie(cookie)
-        logger.debug("new login as {}, token is {}", user.username, token)
+        logger.debug("new login as {}, token is {}", user, token)
     }
 }

@@ -1,6 +1,7 @@
 package per.misaka.misakanetworkscore.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlin.Int
 
 data class PageResultDTO<T>(
     val list: List<T>?,

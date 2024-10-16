@@ -5,24 +5,24 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class CustomerUsernamePasswordAuthenticationToken(
-    private val principal: UserDetails?,
+    private val principal: Int?,
     private var credentials: String?,
-    private val authorities: Collection<GrantedAuthority>? = null
+    authorities: Collection<GrantedAuthority>? = null
 ) : AbstractAuthenticationToken(authorities) {
 
     init {
-        super.isAuthenticated = authorities != null
+        super.setAuthenticated(authorities != null)
     }
 
     companion object {
         @JvmStatic
-        fun unauthenticated(principal: UserDetails, credentials: String?): CustomerUsernamePasswordAuthenticationToken {
+        fun unauthenticated(principal: Int, credentials: String?): CustomerUsernamePasswordAuthenticationToken {
             return CustomerUsernamePasswordAuthenticationToken(principal, credentials)
         }
 
         @JvmStatic
         fun authenticated(
-            principal: UserDetails,
+            principal: Int,
             credentials: String?,
             authorities: Collection<GrantedAuthority>?
         ): CustomerUsernamePasswordAuthenticationToken {
@@ -34,7 +34,7 @@ class CustomerUsernamePasswordAuthenticationToken(
         return credentials
     }
 
-    override fun getPrincipal(): UserDetails? {
+    override fun getPrincipal(): Int? {
         return principal
     }
 

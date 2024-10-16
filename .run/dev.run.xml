@@ -22,8 +22,6 @@
     <option name="SCHEDULED_DEBUGGER" value="true" />
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="misakanetworks-core.main" />
-    <projectPathOnTarget name="projectPathOnTarget" value="{exitCode=0, timeout=false, cancelled=false, stdout=/tmp/tmp.tyJcoVkTLk , stderr=}/misakanetworks-core" />
-    <target name="WSL - Ubuntu-24.04" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="per.misaka.misakanetworkscore.MisakaNetworksCoreApplicationKt" />
     <extension name="coverage">
       <pattern>

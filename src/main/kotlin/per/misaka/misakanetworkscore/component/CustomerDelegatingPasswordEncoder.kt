@@ -1,32 +1,31 @@
 package per.misaka.misakanetworkscore.component
 
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.factory.PasswordEncoderFactories
-import org.springframework.security.crypto.password.*
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder
+import jakarta.annotation.PostConstruct
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder
+import org.springframework.stereotype.Component
 
-class CustomerDelegatingPasswordEncoder : PasswordEncoder {
-    private var passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
+@Component
+class CustomerDelegatingPasswordEncoder() : PasswordEncoder {
+    private lateinit var  passwordEncoder: PasswordEncoder
+    private val idForEncode = "pbkdf2@SpringSecurity_v5_8"
+
+    @PostConstruct
+    fun init() {
+        val v58 = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8()
+        val hashMap = HashMap<String, PasswordEncoder>()
+        hashMap["pbkdf2@SpringSecurity_v5_8"] = v58
+        passwordEncoder = DelegatingPasswordEncoder(idForEncode, hashMap)
+    }
+
     override fun encode(rawPassword: CharSequence?): String {
-        val idForEncode = "bcrypt"
-        val encoders = HashMap<String, PasswordEncoder>()
-        encoders[idForEncode] = BCryptPasswordEncoder()
-        encoders["noop"] = NoOpPasswordEncoder.getInstance()
-        encoders["pbkdf2"] = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_5()
-        encoders["pbkdf2@SpringSecurity_v5_8"] = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8()
-        encoders["scrypt"] = SCryptPasswordEncoder.defaultsForSpringSecurity_v4_1()
-        encoders["scrypt@SpringSecurity_v5_8"] = SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8()
-        encoders["argon2"] = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2()
-        encoders["argon2@SpringSecurity_v5_8"] = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()
-        encoders["sha256"] = StandardPasswordEncoder()
-
-        val passwordEncoder: PasswordEncoder =
-            DelegatingPasswordEncoder(idForEncode, encoders)
-        TODO("Not yet implemented")
+        return passwordEncoder.encode(rawPassword)
     }
 
     override fun matches(rawPassword: CharSequence?, encodedPassword: String?): Boolean {
-        TODO("Not yet implemented")
+        return passwordEncoder.matches(rawPassword, encodedPassword)
     }
 }

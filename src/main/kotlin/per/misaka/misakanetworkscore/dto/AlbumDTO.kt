@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import per.misaka.misakanetworkscore.enums.CategoryType
 import java.time.LocalDateTime
+import kotlin.Int
 
 data class AlbumBrief(
     val id: Int,
@@ -50,8 +51,8 @@ data class AlbumDetail(
         }
 }
 data class AlbumDTO(
-    val id:Int?,
-    val coverId:Int?,
+    val id: Int?,
+    val coverId: Int?,
     val name:String,
     val tags:List<Int>,
     val isPrivate:Boolean,

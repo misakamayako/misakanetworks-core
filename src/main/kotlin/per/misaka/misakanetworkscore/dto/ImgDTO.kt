@@ -1,6 +1,7 @@
 package per.misaka.misakanetworkscore.dto
 
 import jakarta.validation.constraints.NotNull
+import kotlin.Int
 
 data class ImgUploadDTO(
     @NotNull(message="文件地址不能为空")
